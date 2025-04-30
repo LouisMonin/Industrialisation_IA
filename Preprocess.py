@@ -1,25 +1,36 @@
-# Importer les bibliothèques nécessaires
+"""
+Ce module contient des fonctions pour le prétraitement des données, notamment :
+- L'encodage des colonnes ordinales et catégorielles en fonction de la fréquence
+de la variable cible.
+- La conversion des colonnes numériques en types numériques.
+"""
+
 import pandas as pd
 from config import ORDINAL_COLUMNS, CATEGORICAL_COLUMNS, NUMERIC_COLUMNS
 
 
 
-# Encode les colonnes ordinales en fonction de la fréquence de la variable cible  
-def encode_ordinal_by_target_frequency(X, y):
+def encode_ordinal_by_target_frequency(x_data, y_data):
+    """
+    Encode les colonnes ordinales en fonction de la fréquence de la variable cible.
 
-    # X : pd.DataFrame, DataFrame contenant les variables explicatives
-    # y : pd.DataFrame, DataFrame contenant la variable cible
+    Paramètres :
+        - X : pd.DataFrame, DataFrame contenant les variables explicatives
+      (doit contenir une colonne 'ID')
+    - y : pd.DataFrame, DataFrame contenant la variable cible avec la colonne 'ID' et 'FREQ'
 
-    # Sortie :  pd.DataFrame, DataFrame X avec les colonnes ordinales encodées
-    
+    Retour :
+    - X_encoded : pd.DataFrame, DataFrame X avec les colonnes ordinales encodées
+    """
+
     target_name = 'FREQ'
-    X_encoded = X.copy()
+    x_encoded = x_data.copy()
 
     # Fusionner X et y sur la colonne 'ID'
-    merged = pd.merge(X_encoded, y, on='ID')
+    merged = pd.merge(x_encoded, y_data, on='ID')
 
     for col in ORDINAL_COLUMNS:
-        if col in X_encoded.columns:
+        if col in x_encoded.columns:
             # Calculer la fréquence de la cible par valeur de la colonne
             freq_target = merged.groupby(col)[target_name].sum()
 
@@ -30,58 +41,65 @@ def encode_ordinal_by_target_frequency(X, y):
             encoding_dict = {value: idx for idx, value in enumerate(sorted_values)}
 
             # Appliquer l'encodage
-            X_encoded[col] = X_encoded[col].map(encoding_dict)
+            x_encoded[col] = x_encoded[col].map(encoding_dict)
 
-    return X_encoded
+    return x_encoded
 
 
 
-# Encode les colonnes catégorielles en fonction de la fréquence de la variable cible
-def encode_categorical_by_target_frequency(X, y):
+def encode_categorical_by_target_frequency(x_data, y_data):
+    """
+    Encode les colonnes catégorielles en fonction de la fréquence de la variable cible.
 
-    # X : pd.DataFrame, DataFrame contenant les variables explicatives
-    # y : pd.DataFrame, DataFrame contenant la variable cible
+    Paramètres :
+    - X : pd.DataFrame, DataFrame contenant les variables explicatives
+    (doit contenir une colonne 'ID')
+    - y : pd.DataFrame, DataFrame contenant la variable cible avec la colonne 'ID' et 'FREQ'
 
-    # Sortie :  pd.DataFrame, DataFrame X avec les colonnes catégorielles encodées
-    
+    Retour :
+    - X_encoded : pd.DataFrame, DataFrame X avec les colonnes catégorielles encodées
+    """
+
     target_name = 'FREQ'
 
-    X_encoded = X.copy()
-    
+    x_encoded = x_data.copy()
+
     # Fusionner X et y selon la colonne 'ID'
-    merged = pd.merge(X_encoded, y, left_on='ID', right_on='ID')
-    
+    merged = pd.merge(x_encoded, y_data, left_on='ID', right_on='ID')
+
     for col in CATEGORICAL_COLUMNS:
-        if col not in X_encoded.columns:
+        if col in x_encoded.columns:
             # Calculer la fréquence de la cible par valeur de la colonne
             freq_target = merged.groupby(col)[target_name].sum()
-        
+
             # Ordonner les valeurs par fréquence croissante
             sorted_values = freq_target.sort_values().index
-        
+
             # Dictionnaire d'encodage
             encoding_dict = {value: idx for idx, value in enumerate(sorted_values)}
-        
+
             # Appliquer l'encodage
-            X_encoded[col] = X_encoded[col].map(encoding_dict)
+            x_encoded[col] = x_encoded[col].map(encoding_dict)
 
-    return X_encoded
+    return x_encoded
 
 
 
-# Convertir les colonnes numériques
-def convert_to_numeric(X):
-    
-    # X : pd.DataFrame, DataFrame contenant les variables explicatives
-    # Sortie :  pd.DataFrame, DataFrame X avec les colonnes numériques converties
-    
-    # Identifier les colonnes de NUMERIC_COLUMNS présentes dans X
-    cols_to_convert = [col for col in NUMERIC_COLUMNS if col in X.columns]
+def convert_to_numeric(x_data):
+    """
+    Convertit les colonnes numériques spécifiées en types numériques.
+
+    Paramètres :
+    - x_data : pd.DataFrame, DataFrame contenant les variables explicatives.
+
+    Retour :
+    - pd.DataFrame : DataFrame x_data avec les colonnes numériques converties en types numériques.
+      Les valeurs non convertibles sont remplacées par NaN.
+    """
+    cols_to_convert = [col for col in NUMERIC_COLUMNS if col in x_data.columns]
 
     # Appliquer la conversion uniquement sur les colonnes présentes
-    X[cols_to_convert] = X[cols_to_convert].apply(pd.to_numeric, errors='coerce')
+    x_data[cols_to_convert] = x_data[cols_to_convert].apply(pd.to_numeric, errors='coerce')
 
 
-    return X
-
-
+    return x_data
