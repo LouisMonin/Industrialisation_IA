@@ -36,7 +36,6 @@ def encode_ordinal_by_target_frequency(X, y):
     return X_encoded
 
 
-
 # Encode les colonnes catégorielles en fonction de la fréquence de la variable cible
 def encode_categorical_by_target_frequency(X, y):
 
