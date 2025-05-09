@@ -3,7 +3,7 @@
 import joblib
 from sklearn.pipeline import Pipeline
 from preprocessing_refactoring_frequence import ColumnSelector, MissingValueFiller, ManualCountEncoder, ColumnDropper, ScalerWrapper
-from configfrequence import NUMERICAL_COLUMNS, CATEGORIAL_COLUMNS
+from app.configfrequence import NUMERICAL_COLUMNS, CATEGORIAL_COLUMNS
 
 ALL_COLUMNS = NUMERICAL_COLUMNS + CATEGORIAL_COLUMNS
 

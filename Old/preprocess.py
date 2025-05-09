@@ -6,7 +6,7 @@ de la variable cible.
 """
 
 import pandas as pd
-from config import ORDINAL_COLUMNS, CATEGORICAL_COLUMNS, NUMERIC_COLUMNS
+from config_montant import ORDINAL_COLUMNS, CATEGORICAL_COLUMNS, NUMERIC_COLUMNS
 
 
 

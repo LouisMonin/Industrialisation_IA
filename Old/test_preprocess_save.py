@@ -11,7 +11,7 @@ from pandas.testing import assert_series_equal
 import Old.preprocess as preprocess
 
 # Importation des colonnes de configuration
-from config import ORDINAL_COLUMNS, CATEGORICAL_COLUMNS, NUMERIC_COLUMNS
+from config_montant import ORDINAL_COLUMNS, CATEGORICAL_COLUMNS, NUMERIC_COLUMNS
 
 # Surcharge les colonnes utilisées pour les tests
 preprocess.ORDINAL_COLUMNS = ['grade']
