@@ -1,44 +1,45 @@
+"""FastAPI application for predicting insurance claims amount and frequency."""
 import webbrowser
 import uvicorn
-from fastapi import FastAPI
-from pydantic import BaseModel
-from config import ORDINAL_COLUMNS, CATEGORICAL_COLUMNS, NUMERIC_COLUMNS
 import joblib
 import pandas as pd
+from fastapi import FastAPI
+from pydantic import BaseModel
+from config_montant import ORDINAL_COLUMNS, CATEGORICAL_COLUMNS, NUMERIC_COLUMNS
+
 
 # Initialisation de FastAPI
 app = FastAPI(
     title="API de Prédiction CM",
-    description="API pour prédire le montant et la fréquence des sinistres, avec des modèles XGBoost.",
+    description="API pour prédire le montant et la fréquence des sinistres",
     version="1.0",
 )
 
 # Chargement des modèles et des preprocess
-model_montant = joblib.load('model_montant.pkl')  # Modèle XGBoost pour prédiction du montant
-preprocess_montant_pipeline = joblib.load('preprocessing_montant.pkl')  # Pipeline de prétraitement pour montant
-full_model_pipeline = joblib.load('full_model_pipeline.pkl')  # Pipeline complet pour la fréquence
+model_frequence = joblib.load('model_frequence.pkl')
+preprocess_freq_pipeline = joblib.load('preprocessing_frequence.pkl')
+model_montant = joblib.load('model_montant.pkl')
+preprocess_montant_pipeline = joblib.load('preprocessing_montant.pkl')
 
 # Modèles de données pour la requête
 class Item(BaseModel):
+    """Modèle de données pour la requête de prédiction."""
     ID: int
-<<<<<<< HEAD:app/main.py
-    BDTOPO_BAT_MAX_HAUTEUR: float
-    HAUTEUR_MAX: float
-=======
     ordinal_columns: list = ORDINAL_COLUMNS
     categorical_columns: list = CATEGORICAL_COLUMNS
     numeric_columns: list = NUMERIC_COLUMNS
->>>>>>> 001703beeffb8ed1302b5fecb309bec65ef5010d:main.py
 
 
 # Route de santé
 @app.get("/health")
 async def health():
+    """Vérifie la santé de l'API."""
     return {"status": "healthy"}
 
 # Route pour prédire le montant
 @app.post("/predict_montant")
 async def predict_montant(item: Item):
+    """Prédit le montant d'un sinistre."""
     data = pd.DataFrame([item.dict()])
     data_preprocessed = preprocess_montant_pipeline.transform(data)
     prediction = model_montant.predict(data_preprocessed)
@@ -47,23 +48,25 @@ async def predict_montant(item: Item):
 # Route pour prédire la fréquence
 @app.post("/predict_freq")
 async def predict_freq(item: Item):
+    """Prédit la fréquence d'un sinistre."""
     data = pd.DataFrame([item.dict()])
-    data_preprocessed = full_model_pipeline.transform(data)
-    prediction = full_model_pipeline.predict(data_preprocessed)
+    data_preprocessed = preprocess_freq_pipeline.transform(data)
+    prediction = model_frequence.predict(data_preprocessed)
     return {"prediction": prediction.tolist()}
 
 # Route pour prédire le montant et la fréquence (produit des deux)
 @app.post("/predict_global")
 #Produit de prediction de montant et de fréquence
 async def predict_global(item: Item):
+    """Prédit la franchise associée à un sinistre."""
     data = pd.DataFrame([item.dict()])
     data_preprocessed = preprocess_montant_pipeline.transform(data)
     montant_prediction = model_montant.predict(data_preprocessed)
 
     # Prétraitement pour la fréquence
     data_freq = pd.DataFrame({"ID": item.ID})
-    data_freq_preprocessed = full_model_pipeline.transform(data_freq)
-    freq_prediction = full_model_pipeline.predict(data_freq_preprocessed)
+    data_freq_preprocessed = preprocess_freq_pipeline.transform(data_freq)
+    freq_prediction = model_frequence.predict(data_freq_preprocessed)
 
     # Produit des deux prédictions
     global_prediction = montant_prediction * freq_prediction
@@ -71,6 +74,7 @@ async def predict_global(item: Item):
 
 # Fonction pour ouvrir Swagger UI dans le navigateur par défaut
 def open_browser():
+    """Ouvre Swagger UI dans le navigateur par défaut."""
     webbrowser.open("http://127.0.0.1:8000/docs", new=2)
 
 # Démarrer le serveur FastAPI et ouvrir Swagger UI automatiquement
