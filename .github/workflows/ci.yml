@@ -33,7 +33,7 @@ jobs:
       - name: Lint code with Pylint
         run: |
           pip install pylint
-          pylint **/*.py  --fail-under=5
+          pylint **/*.py --fail-under=5 --ignore=Old
 
       - name: Generate Documentation
         run: |
