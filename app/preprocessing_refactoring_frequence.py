@@ -1,4 +1,3 @@
-import pandas as pd
 import numpy as np
 from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.preprocessing import StandardScaler
@@ -10,7 +9,7 @@ class ColumnSelector(BaseEstimator, TransformerMixin):
     def __init__(self, selected_columns):
         self.selected_columns = selected_columns
 
-    def fit(self, X, y=None):
+    def fit(self, X, y=None): # pylint: disable=unused-argument
         return self
 
     def transform(self, X):
@@ -21,7 +20,7 @@ class MissingValueFiller(BaseEstimator, TransformerMixin):
         self.num_cols = num_cols
         self.cat_cols = cat_cols
 
-    def fit(self, X, y=None):
+    def fit(self, X, y=None): # pylint: disable=unused-argument
         return self
 
     def transform(self, X):
@@ -41,7 +40,7 @@ class ManualCountEncoder(BaseEstimator, TransformerMixin):
         self.cat_cols = cat_cols
         self.count_maps = {}
 
-    def fit(self, X, y=None):
+    def fit(self, X, y=None): # pylint: disable=unused-argument
         for col in self.cat_cols:
             counts = X[col].value_counts()
             self.count_maps[col] = counts.to_dict()
@@ -61,7 +60,7 @@ class ColumnDropper(BaseEstimator, TransformerMixin):
         self.corr_thresh = corr_thresh
         self.columns_to_drop_ = []
 
-    def fit(self, X, y=None):
+    def fit(self, X, y=None): # pylint: disable=unused-argument
         X_copy = X.copy()
         drop_cols = []
 
