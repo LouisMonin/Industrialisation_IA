@@ -4,7 +4,7 @@ Refactoring du code de prétraitement pour le rendre plus modulaire et réutilis
 
 import pandas as pd
 from sklearn.base import BaseEstimator, TransformerMixin
-from configmontant import ORDINAL_COLUMNS, CATEGORICAL_COLUMNS, NUMERIC_COLUMNS
+from app.configmontant import ORDINAL_COLUMNS, CATEGORICAL_COLUMNS, NUMERIC_COLUMNS
 
 class OrdinalEncoderByTargetFrequency(BaseEstimator, TransformerMixin):
     """
