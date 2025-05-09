@@ -8,7 +8,7 @@ Ce module contient des tests unitaires pour les fonctions du module preprocess :
 import unittest
 import pandas as pd
 from pandas.testing import assert_series_equal
-import preprocess
+import Old.preprocess as preprocess
 
 # Importation des colonnes de configuration
 from config import ORDINAL_COLUMNS, CATEGORICAL_COLUMNS, NUMERIC_COLUMNS

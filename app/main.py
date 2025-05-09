@@ -20,6 +20,8 @@ full_model_pipeline = joblib.load('full_model_pipeline.pkl')  # Pipeline complet
 # Modèles de données pour la requête
 class ItemMontant(BaseModel):
     ID: int
+    BDTOPO_BAT_MAX_HAUTEUR: float
+    HAUTEUR_MAX: float
 
 class ItemFreq(BaseModel):
     ID: int

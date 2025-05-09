@@ -1,7 +1,15 @@
+"""
+Ce script crée un pipeline de prétraitement pour les données d'entraînement.
+Il encode les colonnes ordinales et catégorielles en fonction de la fréquence de la variable cible
+et convertit les colonnes numériques en types appropriés.
+Il sauvegarde ensuite le pipeline dans un fichier .pkl pour une utilisation ultérieure.
+"""
+
+# Importation des bibliothèques nécessaires
 import pandas as pd
 import pickle
 from sklearn.pipeline import Pipeline
-from refactoring_preprocess import OrdinalEncoderByTargetFrequency, CategoricalEncoderByTargetFrequency, NumericConverter
+from preprocessing_refactoring_montant import OrdinalEncoderByTargetFrequency, CategoricalEncoderByTargetFrequency, NumericConverter
 
 
 # === 1. Charger les données ===

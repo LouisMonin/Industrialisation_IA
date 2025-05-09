@@ -1,12 +1,15 @@
-# Dépendances de base pour ton projet
-pandas
-numpy
-scikit-learn
-pytest
-matplotlib
-seaborn
-joblib
+# requirements.txt
+# Dépendances pour le projet de machine learning
+
+# Dépendances de base
+pandas==1.5.3
+numpy==1.24.1
+scikit-learn==1.2.1
+pytest==7.2.2
+matplotlib==3.7.1
+seaborn==0.11.3
+joblib==1.2.0
 
 # Dépendances pour la génération de documentation
-mkdocs
-mkdocs-material
+mkdocs==1.4.2
+mkdocs-material==9.1.4
