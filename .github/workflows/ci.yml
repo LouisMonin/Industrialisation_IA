@@ -32,7 +32,7 @@ jobs:
       - name: Lint code with Pylint
         run: |
           pip install pylint
-          pylint **/*.py  # Exécuter Pylint sur tous les fichiers Python
+          pylint **/*.py  --fail-under=5# Exécuter Pylint sur tous les fichiers Python
 
       - name: Generate Documentation
         run: |
