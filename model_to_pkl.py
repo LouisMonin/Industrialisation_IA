@@ -20,25 +20,15 @@ class MissingValueFiller(BaseEstimator, TransformerMixin):
     - num_cols : liste de colonnes numériques
     - cat_cols : liste de colonnes catégorielles
     """
-
     def __init__(self, num_cols=None, cat_cols=None):
-        """
-        Initialise le remplisseur de valeurs manquantes avec les colonnes numériques et catégorielles.
-        """
         self.num_cols = num_cols
         self.cat_cols = cat_cols
 
-    def fit(self):
-        """
-        Ajuste le remplisseur sur les données d'entrée.
-        """
+    def fit(self, X, y=None):  # ✅ Correction ici : ajout de X, y=None
         return self
 
-    def transform(self, x):
-        """
-        Transforme les données d'entrée en remplissant les valeurs manquantes.
-        """
-        x_copy = x.copy()
+    def transform(self, X):
+        x_copy = X.copy()
         if self.num_cols:
             for col in self.num_cols:
                 if col in x_copy.columns:

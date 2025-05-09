@@ -2,9 +2,9 @@ from fastapi import FastAPI
 from pydantic import BaseModel
 import joblib
 import numpy as np
-import pandas as pd
 from preprocess_montant import preprocess_montant
 from refactoring_preprocess import preprocess_freq
+import pandas as pd
 from sklearn.pipeline import Pipeline
 
 # Initialisation de FastAPI
@@ -13,7 +13,7 @@ app = FastAPI()
 # Chargement des modèles et des preprocess
 model_montant = joblib.load('model_montant.pkl')  # Modèle XGBoost pour prédiction du montant
 preprocess_montant = joblib.load('preprocessing_montant.pkl')  # Prétraitement pour montant
-xgb_regressor = joblib.load('xgb_regressor.pkl')  # Modèle XGBoost pour fréquence
+xgb_regressor = joblib.load('xgb_regressor_model.pkl')  # Modèle XGBoost pour fréquence
 full_model_pipeline = joblib.load('full_model_pipeline.pkl')  # Pipeline complet pour fréquence
 # Chargement du pipeline de prétraitement pour la fréquence
 
