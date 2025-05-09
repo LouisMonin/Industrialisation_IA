@@ -2,6 +2,7 @@ import webbrowser
 import uvicorn
 from fastapi import FastAPI
 from pydantic import BaseModel
+from config import ORDINAL_COLUMNS, CATEGORICAL_COLUMNS, NUMERIC_COLUMNS
 import joblib
 import pandas as pd
 
@@ -18,13 +19,17 @@ preprocess_montant_pipeline = joblib.load('preprocessing_montant.pkl')  # Pipeli
 full_model_pipeline = joblib.load('full_model_pipeline.pkl')  # Pipeline complet pour la fréquence
 
 # Modèles de données pour la requête
-class ItemMontant(BaseModel):
+class Item(BaseModel):
     ID: int
+<<<<<<< HEAD:app/main.py
     BDTOPO_BAT_MAX_HAUTEUR: float
     HAUTEUR_MAX: float
+=======
+    ordinal_columns: list = ORDINAL_COLUMNS
+    categorical_columns: list = CATEGORICAL_COLUMNS
+    numeric_columns: list = NUMERIC_COLUMNS
+>>>>>>> 001703beeffb8ed1302b5fecb309bec65ef5010d:main.py
 
-class ItemFreq(BaseModel):
-    ID: int
 
 # Route de santé
 @app.get("/health")
@@ -33,7 +38,7 @@ async def health():
 
 # Route pour prédire le montant
 @app.post("/predict_montant")
-async def predict_montant(item: ItemMontant):
+async def predict_montant(item: Item):
     data = pd.DataFrame([item.dict()])
     data_preprocessed = preprocess_montant_pipeline.transform(data)
     prediction = model_montant.predict(data_preprocessed)
@@ -41,7 +46,7 @@ async def predict_montant(item: ItemMontant):
 
 # Route pour prédire la fréquence
 @app.post("/predict_freq")
-async def predict_freq(item: ItemFreq):
+async def predict_freq(item: Item):
     data = pd.DataFrame([item.dict()])
     data_preprocessed = full_model_pipeline.transform(data)
     prediction = full_model_pipeline.predict(data_preprocessed)
@@ -50,7 +55,7 @@ async def predict_freq(item: ItemFreq):
 # Route pour prédire le montant et la fréquence (produit des deux)
 @app.post("/predict_global")
 #Produit de prediction de montant et de fréquence
-async def predict_global(item: ItemMontant):
+async def predict_global(item: Item):
     data = pd.DataFrame([item.dict()])
     data_preprocessed = preprocess_montant_pipeline.transform(data)
     montant_prediction = model_montant.predict(data_preprocessed)
