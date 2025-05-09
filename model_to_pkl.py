@@ -1,11 +1,3 @@
-"""
-Ce script charge un modèle XGBoost entraîné et le sauvegarde dans un pipeline de prétraitement complet.
-Il inclut des étapes de prétraitement personnalisées pour
-traiter les valeurs manquantes, encoder les colonnes
-catégorielles, supprimer les colonnes inutiles et normaliser les données.
-Il utilise également joblib pour la sérialisation du modèle.
-"""
-
 import joblib
 import pandas as pd
 import numpy as np
@@ -14,101 +6,85 @@ from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.preprocessing import StandardScaler
 from xgboost import XGBRegressor
 
+# ——————————————————————————————————————
+# Étapes de prétraitement custom
+# —————————————————————————————————————-
+
+class ColumnSelector(BaseEstimator, TransformerMixin):
+    """
+    Garde uniquement les colonnes sélectionnées.
+    """
+    def __init__(self, selected_columns):
+        self.selected_columns = selected_columns
+
+    def fit(self, X, y=None):
+        return self
+
+    def transform(self, X):
+        return X[self.selected_columns].copy()
+
 class MissingValueFiller(BaseEstimator, TransformerMixin):
-    """
-    Remplit les valeurs manquantes dans les colonnes numériques et catégorielles.
-    - num_cols : liste de colonnes numériques
-    - cat_cols : liste de colonnes catégorielles
-    """
     def __init__(self, num_cols=None, cat_cols=None):
         self.num_cols = num_cols
         self.cat_cols = cat_cols
 
-    def fit(self, X, y=None):  # ✅ Correction ici : ajout de X, y=None
+    def fit(self, X, y=None):
         return self
 
     def transform(self, X):
-        x_copy = X.copy()
+        X_copy = X.copy()
         if self.num_cols:
             for col in self.num_cols:
-                if col in x_copy.columns:
-                    x_copy[col] = x_copy[col].fillna(0)
+                if col in X_copy.columns:
+                    X_copy[col] = X_copy[col].fillna(0)
         if self.cat_cols:
             for col in self.cat_cols:
-                if col in x_copy.columns:
-                    x_copy[col] = x_copy[col].fillna("Inconnu")
-        return x_copy
+                if col in X_copy.columns:
+                    X_copy[col] = X_copy[col].fillna("Inconnu")
+        return X_copy
 
 class ManualCountEncoder(BaseEstimator, TransformerMixin):
-    """
-    Encode les colonnes catégorielles en fonction de la fréquence de la variable cible.
-    - cat_cols : liste de colonnes catégorielles
-    """
-
     def __init__(self, cat_cols=None):
-        """
-        Initialise l'encodeur avec les colonnes catégorielles.
-        """
         self.cat_cols = cat_cols
         self.count_maps = {}
 
-    def fit(self, x):
-        """
-        Ajuste l'encodeur sur les données d'entrée.
-        """
+    def fit(self, X, y=None):
         for col in self.cat_cols:
-            counts = x[col].value_counts()
+            counts = X[col].value_counts()
             self.count_maps[col] = counts.to_dict()
         return self
 
-    def transform(self, x):
-        """
-        Transforme les données d'entrée en appliquant l'encodage.
-        """
-        x_copy = x.copy()
+    def transform(self, X):
+        X_copy = X.copy()
         for col in self.cat_cols:
-            x_copy[col] = x_copy[col].map(self.count_maps[col]).fillna(0)
-        return x_copy
+            X_copy[col] = X_copy[col].map(self.count_maps[col]).fillna(0)
+        return X_copy
 
 class ColumnDropper(BaseEstimator, TransformerMixin):
-    """
-    Supprime les colonnes avec trop de valeurs manquantes, faible variance ou forte corrélation.
-    - num_cols : liste de colonnes numériques
-    - missing_thresh : seuil de valeurs manquantes
-    - var_thresh : seuil de variance
-    - corr_thresh : seuil de corrélation
-    """
-
     def __init__(self, num_cols=None, missing_thresh=0.4, var_thresh=0.01, corr_thresh=0.95):
-        """
-        Initialise le supprimeur de colonnes avec les paramètres spécifiés.
-        """
         self.num_cols = num_cols
         self.missing_thresh = missing_thresh
         self.var_thresh = var_thresh
         self.corr_thresh = corr_thresh
         self.columns_to_drop_ = []
 
-    def fit(self, x):
-        """
-        Ajuste le supprimeur sur les données d'entrée.
-        """
-        x_copy = x.copy()
+    def fit(self, X, y=None):
+        X_copy = X.copy()
         drop_cols = []
 
-        for col in x_copy.columns:
+        for col in X_copy.columns:
             if col in self.num_cols:
-                missing_ratio = (x_copy[col] == 0).sum() / len(x_copy)
+                missing_ratio = (X_copy[col] == 0).sum() / len(X_copy)
             else:
-                missing_ratio = (x_copy[col] == "Inconnu").sum() / len(x_copy)
+                missing_ratio = (X_copy[col] == "Inconnu").sum() / len(X_copy)
             if missing_ratio > self.missing_thresh:
                 drop_cols.append(col)
 
-        var_series = x_copy.var(numeric_only=True)
+        var_series = X_copy.var(numeric_only=True)
         low_var_cols = var_series[var_series < self.var_thresh].index.tolist()
         drop_cols += low_var_cols
 
-        corr_matrix = x_copy.select_dtypes(include=["number"]).corr().abs()
+        corr_matrix = X_copy.select_dtypes(include=["number"]).corr().abs()
         upper_tri = corr_matrix.where(np.triu(np.ones(corr_matrix.shape), k=1).astype(bool))
         high_corr_cols = [col for col in upper_tri.columns if any(upper_tri[col] > self.corr_thresh)]
         drop_cols += high_corr_cols
@@ -116,40 +92,28 @@ class ColumnDropper(BaseEstimator, TransformerMixin):
         self.columns_to_drop_ = list(set(drop_cols))
         return self
 
-    def transform(self, x):
-        """
-        Transforme les données d'entrée en supprimant les colonnes inutiles.
-        """
-        return x.drop(columns=self.columns_to_drop_, errors='ignore')
+    def transform(self, X):
+        return X.drop(columns=self.columns_to_drop_, errors='ignore')
 
 class ScalerWrapper(BaseEstimator, TransformerMixin):
-    """
-    Applique un StandardScaler sur les colonnes numériques.
-    - num_cols : liste de colonnes numériques
-    """
     def __init__(self, num_cols=None):
-        """
-        Initialise le wrapper de scaler avec les colonnes numériques.
-        """
         self.num_cols = num_cols
         self.scaler = StandardScaler()
 
-    def fit(self, x):
-        """
-        Ajuste le scaler sur les données d'entrée.
-        """
+    def fit(self, X, y=None):
         if self.num_cols:
-            self.scaler.fit(x[self.num_cols])
+            self.scaler.fit(X[self.num_cols])
         return self
 
-    def transform(self, x):
-        """
-        Transforme les données d'entrée en appliquant le scaler.
-        """
-        x_copy = x.copy()
+    def transform(self, X):
+        X_copy = X.copy()
         if self.num_cols:
-            x_copy[self.num_cols] = self.scaler.transform(x_copy[self.num_cols])
-        return x_copy
+            X_copy[self.num_cols] = self.scaler.transform(X_copy[self.num_cols])
+        return X_copy
+
+# ——————————————————————————————————————
+# Colonnes issues de ton fichier config
+# ——————————————————————————————————————
 
 CATEGORIAL_COLUMNS = ["ACTIVIT2", "VOCATION", "CARACT1", "CARACT3", "CARACT4", "TYPBAT1", "INDEM2", "FRCH1", "FRCH2",
     "DEROG12", "DEROG13", "DEROG14", "DEROG16", "TAILLE1", "TAILLE2", "COEFASS", "RISK6", "RISK8",
@@ -194,7 +158,8 @@ CATEGORIAL_COLUMNS = ["ACTIVIT2", "VOCATION", "CARACT1", "CARACT3", "CARACT4", "
     "NBJRR50_MSOM_A", "NBJRR1_MM_A", "NBJRR1_MMAX_A", "NBJRR1_MSOM_A", "NBJRR5_MM_A", "NBJRR5_MMAX_A",
     "NBJRR5_MSOM_A", "NBJRR10_MM_A", "NBJRR10_MMAX_A", "NBJRR10_MSOM_A", "NBJRR30_MM_A",
     "NBJRR30_MMAX_A", "NBJRR30_MSOM_A", "NBJRR100_MM_A", "NBJRR100_MMAX_A", "NBJRR100_MSOM_A",
-    "RR_VOR_MM_A", "RR_VOR_MMAX_A", "RRAB_VOR_MM_A", "RRAB_VOR_MMAX_A", "ESPINSEE" ]  # Mets ici la liste complète
+    "RR_VOR_MM_A", "RR_VOR_MMAX_A", "RRAB_VOR_MM_A", "RRAB_VOR_MMAX_A", "ESPINSEE" ]
+
 NUMERICAL_COLUMNS = [ "ID",
   "TYPERS",
   "ANCIENNETE",
@@ -219,7 +184,9 @@ NUMERICAL_COLUMNS = [ "ID",
   "capital_total",
   "surface_par_batiment",
   "capital_par_surface",
-  "capital_moyen_par_batiment" ]   # Mets ici la liste complète
+  "capital_moyen_par_batiment" ]
+
+ALL_COLUMNS = NUMERICAL_COLUMNS + CATEGORIAL_COLUMNS
 
 # ——————————————————————————————————————
 # Chargement du modèle entraîné
@@ -232,6 +199,7 @@ model = joblib.load("xgb_regressor_model.pkl")
 # ——————————————————————————————————————
 
 pipeline = Pipeline(steps=[
+    ("select", ColumnSelector(selected_columns=ALL_COLUMNS)),
     ("missing", MissingValueFiller(num_cols=NUMERICAL_COLUMNS, cat_cols=CATEGORIAL_COLUMNS)),
     ("encoding", ManualCountEncoder(cat_cols=CATEGORIAL_COLUMNS)),
     ("drop", ColumnDropper(num_cols=NUMERICAL_COLUMNS)),

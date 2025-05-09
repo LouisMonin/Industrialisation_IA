@@ -1,44 +1,32 @@
 from fastapi import FastAPI
 from pydantic import BaseModel
+from model_to_pkl import ColumnSelector, MissingValueFiller, ManualCountEncoder, ColumnDropper, ScalerWrapper
+from refactoring_preprocess import OrdinalEncoderByTargetFrequency, CategoricalEncoderByTargetFrequency, NumericConverter
 import joblib
-import numpy as np
-from preprocess_montant import preprocess_montant
-from refactoring_preprocess import preprocess_freq
 import pandas as pd
-from sklearn.pipeline import Pipeline
 
 # Initialisation de FastAPI
 app = FastAPI()
 
 # Chargement des modèles et des preprocess
 model_montant = joblib.load('model_montant.pkl')  # Modèle XGBoost pour prédiction du montant
-preprocess_montant = preprocess_montant()  # Prétraitement pour montant
-xgb_regressor = joblib.load('xgb_regressor_model.pkl')  # Modèle XGBoost pour fréquence
-full_model_pipeline = joblib.load('full_model_pipeline.pkl')  # Pipeline complet pour fréquence
-# Chargement du pipeline de prétraitement pour la fréquence
+preprocess_montant_pipeline = joblib.load('preprocessing_montant.pkl')  # Pipeline de prétraitement pour montant
+full_model_pipeline = joblib.load('full_model_pipeline.pkl')  # Pipeline complet pour la fréquence
 
 # Modèle de données pour la requête
-class Item(BaseModel):
-    ID: int
-    # Ajoutez ici d'autres champs selon votre modèle de données
-    # Par exemple :
-    # column1: str
-    # column2: float
-    # Assurez-vous que les noms des champs correspondent à ceux de votre DataFrame
 class ItemMontant(BaseModel):
     ID: int
     # Ajoutez ici d'autres champs selon votre modèle de données
     # Par exemple :
     # column1: str
     # column2: float
-    # Assurez-vous que les noms des champs correspondent à ceux de votre DataFrame
+
 class ItemFreq(BaseModel):
     ID: int
     # Ajoutez ici d'autres champs selon votre modèle de données
     # Par exemple :
     # column1: str
     # column2: float
-    # Assurez-vous que les noms des champs correspondent à ceux de votre DataFrame
 
 # Route pour prédire le montant
 @app.post("/predict_montant")
@@ -46,10 +34,10 @@ async def predict_montant(item: ItemMontant):
     # Convertir l'objet en DataFrame
     data = pd.DataFrame([item.dict()])
 
-    # Prétraitement des données
-    data_preprocessed = preprocess_montant.transform(data)
+    # Prétraitement des données avec le pipeline
+    data_preprocessed = preprocess_montant_pipeline.transform(data)
 
-    # Prédiction
+    # Prédiction avec le modèle de montant
     prediction = model_montant.predict(data_preprocessed)
 
     return {"prediction": prediction.tolist()}
@@ -60,24 +48,24 @@ async def predict_freq(item: ItemFreq):
     # Convertir l'objet en DataFrame
     data = pd.DataFrame([item.dict()])
 
-    # Prétraitement des données
-    data_preprocessed = preprocess_freq.transform(data)
+    # Prétraitement des données avec le pipeline de fréquence
+    data_preprocessed = full_model_pipeline.transform(data)
 
-    # Prédiction
-    prediction = xgb_regressor.predict(data_preprocessed)
+    # Prédiction avec le modèle complet pour la fréquence
+    prediction = full_model_pipeline.predict(data_preprocessed)
 
     return {"prediction": prediction.tolist()}
 
-# Route pour prédire le montant avec le pipeline complet
+# Route pour prédire l'output final avec le pipeline complet
 @app.post("/predict_global")
-async def predict_global(item: Item):
+async def predict_global(item: ItemMontant):
     # Convertir l'objet en DataFrame
     data = pd.DataFrame([item.dict()])
 
-    # Prétraitement des données
-    data_preprocessed = preprocess_freq.transform(data)
+    # Prétraitement des données avec le pipeline complet pour fréquence
+    data_preprocessed = full_model_pipeline.transform(data)
 
-    # Prédiction
+    # Prédiction avec le modèle complet
     prediction = full_model_pipeline.predict(data_preprocessed)
 
     return {"prediction": prediction.tolist()}
