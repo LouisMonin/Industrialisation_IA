@@ -34,18 +34,8 @@ jobs:
           pip install mkdocs mkdocs-material
           mkdocs build --site-dir=public
 
-      - name: Vérifier si le répertoire public existe
-        run: |
-          if [ ! -d "./public" ]; then echo "Le répertoire public n'existe pas !"; exit 1; fi
-
-      - name: Configurer Git
-        run: |
-          git config --global user.name "LouisMonin"
-          git config --global user.email "LouisMonin@users.noreply.github.com"
-          git remote set-url origin https://${{ secrets.GH_TOKEN }}@github.com/LouisMonin/Industrialisation_IA.git
-
-      - name: Déployer la documentation sur GitHub Pages
+      - name: Deploy Documentation to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
         with:
-          personal_token: ${{ secrets.GH_TOKEN }}  # Assurez-vous que ce secret a les bonnes permissions
+          github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./public
