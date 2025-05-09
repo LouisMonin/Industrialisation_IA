@@ -5,10 +5,7 @@ scikit-learn
 pytest
 matplotlib
 seaborn
-pickle
 joblib
-unittest
-Old
 
 # Dépendances pour la génération de documentation
 mkdocs
