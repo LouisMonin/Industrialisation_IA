@@ -29,10 +29,11 @@ jobs:
         run: |
           python -m pytest tests/
 
+        # Exécuter Pylint sur tous les fichiers Python
       - name: Lint code with Pylint
         run: |
           pip install pylint
-          pylint **/*.py  --fail-under=5# Exécuter Pylint sur tous les fichiers Python
+          pylint **/*.py  --fail-under=5
 
       - name: Generate Documentation
         run: |
