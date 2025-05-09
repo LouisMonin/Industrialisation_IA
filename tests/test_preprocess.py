@@ -9,6 +9,8 @@ import unittest
 import pandas as pd
 from pandas.testing import assert_series_equal
 import preprocess
+
+# Importation des colonnes de configuration
 from config import ORDINAL_COLUMNS, CATEGORICAL_COLUMNS, NUMERIC_COLUMNS
 
 # Surcharge les colonnes utilisées pour les tests
@@ -66,4 +68,5 @@ class TestPreprocessing(unittest.TestCase):
 
 
 if __name__ == '__main__':
+    # Exécute les tests
     unittest.main()
