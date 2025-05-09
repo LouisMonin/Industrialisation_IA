@@ -2,6 +2,7 @@ import webbrowser
 import uvicorn
 from fastapi import FastAPI
 from pydantic import BaseModel
+from config import ORDINAL_COLUMNS, CATEGORICAL_COLUMNS, NUMERIC_COLUMNS
 import joblib
 import pandas as pd
 
@@ -20,9 +21,15 @@ full_model_pipeline = joblib.load('full_model_pipeline.pkl')  # Pipeline complet
 # Modèles de données pour la requête
 class ItemMontant(BaseModel):
     ID: int
+    ordinal_columns: list = ORDINAL_COLUMNS
+    categorical_columns: list = CATEGORICAL_COLUMNS
+    numeric_columns: list = NUMERIC_COLUMNS
 
 class ItemFreq(BaseModel):
     ID: int
+    ordinal_columns: list = ORDINAL_COLUMNS
+    categorical_columns: list = CATEGORICAL_COLUMNS
+    numeric_columns: list = NUMERIC_COLUMNS
 
 # Route de santé
 @app.get("/health")
