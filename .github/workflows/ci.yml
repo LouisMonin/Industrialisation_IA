@@ -29,6 +29,11 @@ jobs:
         run: |
           pytest tests/
 
+      - name: Lint code with Pylint
+        run: |
+          pip install pylint
+          pylint **/*.py  # Exécuter Pylint sur tous les fichiers Python
+
       - name: Generate Documentation
         run: |
           pip install mkdocs mkdocs-material
