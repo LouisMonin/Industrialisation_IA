@@ -9,6 +9,7 @@ import unittest
 import pandas as pd
 from pandas.testing import assert_series_equal
 import preprocess
+from config import ORDINAL_COLUMNS, CATEGORICAL_COLUMNS, NUMERIC_COLUMNS
 
 # Surcharge les colonnes utilisées pour les tests
 preprocess.ORDINAL_COLUMNS = ['grade']
