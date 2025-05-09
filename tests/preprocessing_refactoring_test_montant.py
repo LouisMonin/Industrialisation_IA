@@ -16,7 +16,7 @@ from preprocessing_refactoring_montant import (
 )
 
 # Définition des colonnes utilisées pour les tests
-from config_montant import ORDINAL_COLUMNS, CATEGORICAL_COLUMNS, NUMERIC_COLUMNS
+from config import ORDINAL_COLUMNS, CATEGORICAL_COLUMNS, NUMERIC_COLUMNS
 
 # Surcharge temporaire des colonnes dans le contexte de test
 ORDINAL_COLUMNS[:] = ['grade']
