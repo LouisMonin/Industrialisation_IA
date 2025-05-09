@@ -9,14 +9,14 @@ import unittest
 import pandas as pd
 from pandas.testing import assert_series_equal
 
-from preprocessing_refactoring_montant import (
+from app.preprocessing_refactoring_montant import (
     OrdinalEncoderByTargetFrequency,
     CategoricalEncoderByTargetFrequency,
     NumericConverter
 )
 
 # Définition des colonnes utilisées pour les tests
-from config import ORDINAL_COLUMNS, CATEGORICAL_COLUMNS, NUMERIC_COLUMNS
+from app.configmontant import ORDINAL_COLUMNS, CATEGORICAL_COLUMNS, NUMERIC_COLUMNS
 
 # Surcharge temporaire des colonnes dans le contexte de test
 ORDINAL_COLUMNS[:] = ['grade']

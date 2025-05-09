@@ -27,7 +27,7 @@ jobs:
 
       - name: Run tests
         run: |
-          pytest tests/preprocessing_refactoring_test_montant.py
+          python -m pytest tests/
 
       - name: Lint code with Pylint
         run: |
