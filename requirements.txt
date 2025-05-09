@@ -1,0 +1,12 @@
+# Dépendances de base pour ton projet
+pandas
+numpy
+scikit-learn
+pytest
+matplotlib
+seaborn
+joblib
+
+# Dépendances pour la génération de documentation
+mkdocs
+mkdocs-material
