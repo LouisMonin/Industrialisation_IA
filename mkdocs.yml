@@ -1,0 +1,5 @@
+site_name: Industrialisation IA
+theme:
+  name: material
+nav:
+  - Accueil: index.md

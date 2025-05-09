@@ -1,0 +1,1 @@
+{"config":{"lang":["en"],"separator":"[\\s\\-]+","pipeline":["stopWordFilter"]},"docs":[{"location":"","title":"Bienvenue dans la documentation de mon projet","text":"<p>Voici le contenu de la documentation.</p>"}]}
