@@ -19,6 +19,7 @@ class ItemMontant(BaseModel):
     # Ajoutez ici d'autres champs selon votre modèle de données
     # Par exemple :
     # column1: str
+
     # column2: float
 
 class ItemFreq(BaseModel):
