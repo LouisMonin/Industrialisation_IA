@@ -65,13 +65,13 @@ class CategoricalEncoderByTargetFrequency(BaseEstimator, TransformerMixin):
         self.id_col = id_col
         self.encoding_maps = {}
 
-    def fit(self, x_data, y):
+    def fit(self, x_data, y_data):
         """
         Ajuste l'encodeur sur les données d'entrée et la cible.
         """
         df = x_data.copy()
-        df[self.target_col] = y[self.target_col].values
-        df[self.id_col] = y[self.id_col].values
+        df[self.target_col] = y_data[self.target_col].values
+        df[self.id_col] = y_data[self.id_col].values
 
         for col in CATEGORICAL_COLUMNS:
             if col in df.columns:
@@ -98,7 +98,7 @@ class NumericConverter(BaseEstimator, TransformerMixin):
     def __init__(self):
         self.columns = list(NUMERIC_COLUMNS)
 
-    def fit(self, x_data):
+    def fit(self, x_data, y=None):
         """
         Ajuste le convertisseur sur les données d'entrée.
         """
