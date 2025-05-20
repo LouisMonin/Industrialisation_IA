@@ -11,6 +11,7 @@ seaborn==0.11.2
 joblib==1.2.0
 uvicorn
 fastapi
+xgboost
 
 # Dépendances pour la génération de documentation
 mkdocs==1.4.2
