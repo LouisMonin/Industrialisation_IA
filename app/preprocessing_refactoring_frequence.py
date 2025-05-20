@@ -10,9 +10,11 @@ class ColumnSelector(BaseEstimator, TransformerMixin):
         self.selected_columns = selected_columns
 
     def fit(self, X, y=None): # pylint: disable=unused-argument
+        """Ajuste le sélecteur de colonnes."""
         return self
 
     def transform(self, X):
+        """Transforme les données en gardant uniquement les colonnes sélectionnées."""
         return X[self.selected_columns].copy()
 
 class MissingValueFiller(BaseEstimator, TransformerMixin):
@@ -24,9 +26,11 @@ class MissingValueFiller(BaseEstimator, TransformerMixin):
         self.cat_cols = cat_cols
 
     def fit(self, X, y=None): # pylint: disable=unused-argument
+        """Ajuste le remplissage des valeurs manquantes."""
         return self
 
     def transform(self, X):
+        """Remplit les valeurs manquantes dans les colonnes numériques et catégorielles."""
         X_copy = X.copy()
         if self.num_cols:
             for col in self.num_cols:
@@ -47,12 +51,14 @@ class ManualCountEncoder(BaseEstimator, TransformerMixin):
         self.count_maps = {}
 
     def fit(self, X, y=None): # pylint: disable=unused-argument
+        """Calcule les fréquences pour chaque catégorie dans les colonnes spécifiées."""
         for col in self.cat_cols:
             counts = X[col].value_counts()
             self.count_maps[col] = counts.to_dict()
         return self
 
     def transform(self, X):
+        """Transforme les colonnes catégorielles en utilisant les fréquences calculées."""
         X_copy = X.copy()
         for col in self.cat_cols:
             X_copy[col] = X_copy[col].map(self.count_maps[col]).fillna(0)
@@ -70,6 +76,7 @@ class ColumnDropper(BaseEstimator, TransformerMixin):
         self.columns_to_drop_ = []
 
     def fit(self, X, y=None): # pylint: disable=unused-argument
+        """Identifie les colonnes à supprimer."""
         X_copy = X.copy()
         drop_cols = []
 
@@ -94,6 +101,7 @@ class ColumnDropper(BaseEstimator, TransformerMixin):
         return self
 
     def transform(self, X):
+        """Supprime les colonnes identifiées lors de l'ajustement."""
         return X.drop(columns=self.columns_to_drop_, errors='ignore')
 
 class ScalerWrapper(BaseEstimator, TransformerMixin):
@@ -105,11 +113,13 @@ class ScalerWrapper(BaseEstimator, TransformerMixin):
         self.scaler = StandardScaler()
 
     def fit(self, X, y=None):
+        """Ajuste le scaler sur les colonnes numériques."""
         if self.num_cols:
             self.scaler.fit(X[self.num_cols])
         return self
 
     def transform(self, X):
+        """Transforme les données en appliquant le scaler."""
         X_copy = X.copy()
         if self.num_cols:
             X_copy[self.num_cols] = self.scaler.transform(X_copy[self.num_cols])
