@@ -15,10 +15,10 @@ app = FastAPI(
 )
 
 # Chargement des modèles et des preprocess
-model_frequence = joblib.load('model_frequence.pkl')
-preprocess_freq_pipeline = joblib.load('preprocessing_frequence.pkl')
-model_montant = joblib.load('model_montant.pkl')
-preprocess_montant_pipeline = joblib.load('preprocessing_montant.pkl')
+model_frequence = joblib.load('./app/model_frequence.pkl')
+preprocess_freq_pipeline = joblib.load('./app/preprocessing_frequence.pkl')
+model_montant = joblib.load('./app/model_montant.pkl')
+preprocess_montant_pipeline = joblib.load('./app/preprocessing_montant.pkl')
 
 # Modèles de données pour la requête
 class Item(BaseModel):
