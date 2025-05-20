@@ -6,6 +6,8 @@ Ce module contient des tests unitaires pour les fonctions du module preprocess :
 """
 
 import unittest
+import sys
+sys.path.append('../app')
 import pandas as pd
 from pandas.testing import assert_series_equal
 
