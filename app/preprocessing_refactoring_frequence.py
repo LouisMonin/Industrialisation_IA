@@ -16,6 +16,9 @@ class ColumnSelector(BaseEstimator, TransformerMixin):
         return X[self.selected_columns].copy()
 
 class MissingValueFiller(BaseEstimator, TransformerMixin):
+    """
+    Remplit les valeurs manquantes dans les colonnes numériques et catégorielles.
+    """
     def __init__(self, num_cols=None, cat_cols=None):
         self.num_cols = num_cols
         self.cat_cols = cat_cols
@@ -36,6 +39,9 @@ class MissingValueFiller(BaseEstimator, TransformerMixin):
         return X_copy
 
 class ManualCountEncoder(BaseEstimator, TransformerMixin):
+    """
+    Encode les colonnes catégorielles en utilisant la fréquence de chaque catégorie.
+    """
     def __init__(self, cat_cols=None):
         self.cat_cols = cat_cols
         self.count_maps = {}
@@ -53,6 +59,9 @@ class ManualCountEncoder(BaseEstimator, TransformerMixin):
         return X_copy
 
 class ColumnDropper(BaseEstimator, TransformerMixin):
+    """
+    Supprime les colonnes avec trop de valeurs manquantes, faible variance ou forte corrélation.
+    """
     def __init__(self, num_cols=None, missing_thresh=0.4, var_thresh=0.01, corr_thresh=0.95):
         self.num_cols = num_cols
         self.missing_thresh = missing_thresh
@@ -88,6 +97,9 @@ class ColumnDropper(BaseEstimator, TransformerMixin):
         return X.drop(columns=self.columns_to_drop_, errors='ignore')
 
 class ScalerWrapper(BaseEstimator, TransformerMixin):
+    """
+    Applique un StandardScaler sur les colonnes numériques.
+    """
     def __init__(self, num_cols=None):
         self.num_cols = num_cols
         self.scaler = StandardScaler()
