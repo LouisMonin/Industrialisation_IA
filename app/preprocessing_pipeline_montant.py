@@ -19,13 +19,13 @@ y = pd.read_csv("/Users/sabine/Desktop/CYTech/S3/Data_science/ProjetFinal/03.Don
 # === 2. Créer les objets de prétraitement ===
 ordinal_encoder = OrdinalEncoderByTargetFrequency(target_col='FREQ', id_col='ID')
 categorical_encoder = CategoricalEncoderByTargetFrequency(target_col='FREQ', id_col='ID')
-numeric_converter = NumericConverter()
+#numeric_converter = NumericConverter()
 
 # === 3. Créer un pipeline ===
 preprocessing_pipeline = Pipeline([
     ("ordinal_encoder", ordinal_encoder),
     ("categorical_encoder", categorical_encoder),
-    ("numeric_converter", numeric_converter)
+    #("numeric_converter", numeric_converter)
 ])
 
 # === 4. Entraîner le pipeline ===

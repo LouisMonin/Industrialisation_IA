@@ -50,12 +50,14 @@ class CategoricalEncoderByTargetFrequency:
         self.encoding_maps = {}
 
     def fit(self, X, y):
+        # Fusion propre pour avoir target_col et id_col
         df = X.copy()
         df[self.target_col] = y[self.target_col].values
         df[self.id_col] = y[self.id_col].values
 
         for col in CATEGORICAL_COLUMNS:
             if col in df.columns:
+                df[col] = df[col].astype(str).fillna("MISSING")
                 freq = df.groupby(col)[self.target_col].sum()
                 sorted_values = freq.sort_values().index
                 self.encoding_maps[col] = {val: i for i, val in enumerate(sorted_values)}
@@ -65,7 +67,13 @@ class CategoricalEncoderByTargetFrequency:
         X_encoded = X.copy()
         for col, mapping in self.encoding_maps.items():
             if col in X_encoded.columns:
-                X_encoded[col] = X_encoded[col].map(mapping)
+                X_encoded[col] = (
+                    X_encoded[col]
+                    .astype(str)  # Important pour éviter les erreurs si type mixte
+                    .fillna("MISSING")
+                    .map(lambda val: mapping.get(val, -1))  # encode -1 si inconnu
+                    .astype("int")
+                )
         return X_encoded
 
 
