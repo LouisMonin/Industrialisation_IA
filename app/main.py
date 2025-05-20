@@ -81,7 +81,7 @@ if __name__ == "__main__":
     import threading
 
     # Démarrer le serveur dans un thread séparé
-    threading.Thread(target=lambda: uvicorn.run(app, host="127.0.0.1", port=8000)).start()
+    threading.Thread(target=lambda: uvicorn.run(app, host="0.0.0.0", port=8000)).start()
 
     # Ouvrir Swagger UI dans le navigateur par défaut
     open_browser()
